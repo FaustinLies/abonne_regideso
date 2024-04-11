@@ -1,0 +1,289 @@
+<?php
+// Récupérer la valeur de recherche envoyée en AJAX
+$recherche = $_GET['recherche'];
+
+// Effectuer la recherche dans la base de données en utilisant la valeur de recherche
+$pdo = connection();
+$query = $pdo->prepare("SELECT t.`id` AS travailId, `montant` AS prix, `nom`, `dateDebut`, `dateFin`
+                        FROM travauxraccordement AS t
+                        INNER JOIN devis AS d ON d.id = t.`id_devis`
+                        WHERE t.`nom` LIKE :recherche
+                        OR t.`montant` LIKE :recherche
+                        OR t.`dateDebut` LIKE :recherche
+                        OR t.`dateFin` LIKE :recherche");
+$query->bindValue(':recherche', '%' . $recherche . '%', PDO::PARAM_STR);
+$query->execute();
+
+$output = '';
+while ($row = $query->fetch()) {
+    $output .= "<tr>";
+    $output .= "<td>" . $row['travailId'] . "</td>";
+    $output .= "<td>" . $row['prix'] . "</td>";
+    $output .= "<td>" . $row['nom'] . "</td>";
+    $output .= "<td>" . $row['dateDebut'] . "</td>";
+    $output .= "<td>" . $row['dateFin'] . "</td>";
+    $output .= "<td><button class='btn btn-primary btn-update' id=" . $row['travailId'] . "><i class='ri-edit-box-fill'></i></button></td>";
+    $output .= "<td><button class='btn btn-danger btn-click' id=" . $row['travailId'] . "><i class='ri-delete-bin-6-fill'></i></button></td>";
+    $output .= "</tr>";
+}
+
+echo $output;
+?>
+
+<form method="GET" id="searchForm">
+    <div class="row">
+        <div class="col-sm-6">
+            <label><h5>Liste de tous les élèves par page:</h5></label>
+            <select name="pp">
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+            <input type="hidden" name="p" value="<?php echo $current ?>">
+        </div>
+        <div class="col-sm-6">
+            <div class="input-group" id="n-table">
+                <input type="text" class="form-control" name="recherche" id="recherche" placeholder="Rechercher...">
+                <button class="btn btn-secondary" name="send" type="submit">Search</i></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table id="travailTable">
+    <!-- Tableau des résultats de recherche -->
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Fonction pour envoyer la requête AJAX
+    function searchTravaux() {
+        var recherche = $('#recherche').val();
+
+        $.ajax({
+            url: 'search.php', // Fichier PHP pour traiter la recherche
+            method: 'GET',
+            data: { recherche: recherche },
+            success: function(response) {
+                $('#travailTable').html(response); // Mettre à jour le contenu du tableau avec les résultats
+            }
+        });
+    }
+
+    // Appel de la fonction de recherche lorsque le formulaire est soumis
+    $('#searchForm').submit(function(e) {
+        e.preventDefault(); // Empêcher le rechargement de la page
+        searchTravaux();
+    });
+
+    // Appel de la fonction de recherche lorsque du texte est saisi dans le champ de recherche
+    $('#recherche').keyup(function() {
+        searchTravaux();
+    });
+});
+</script>
+
+
+
+
+
+
+
+
+<form method="GET" id="searchForm">
+    <div class="row">
+        <div class="col-sm-6">
+            <label><h5>Liste de tous les élèves par page:</h5></label>
+            <select name="pp">
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+            <input type="hidden" name="p" value="<?php echo $current ?>">
+        </div>
+        <div class="col-sm-6">
+            <div class="input-group" id="n-table">
+                <input type="text" class="form-control" name="recherche" id="recherche" placeholder="Rechercher...">
+                <button class="btn btn-secondary" name="send" type="submit">Search</i></button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table id="travailTable">
+    <!-- Tableau des résultats de recherche -->
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Fonction pour envoyer la requête AJAX
+    function searchTravaux() {
+        var recherche = $('#recherche').val();
+
+        $.ajax({
+            url: 'search.php', // Fichier PHP pour traiter la recherche
+            method: 'GET',
+            data: { recherche: recherche },
+            success: function(response) {
+                $('#travailTable').html(response); // Mettre à jour le contenu du tableau avec les résultats
+            }
+        });
+    }
+
+    // Appel de la fonction de recherche lorsque le formulaire est soumis
+    $('#searchForm').submit(function(e) {
+        e.preventDefault(); // Empêcher le rechargement de la page
+        searchTravaux();
+    });
+
+    // Appel de la fonction de recherche lorsque du texte est saisi dans le champ de recherche
+    $('#recherche').keyup(function() {
+        searchTravaux();
+    });
+});
+</script>
+
+
+
+$(document).ready(function() {
+    // Fonction pour effectuer la recherche
+    function rechercher() {
+        var recherche = $('#searchInput').val();
+
+        $.ajax({
+            url: 'search.php',
+            type: 'GET',
+            data: { recherche: recherche },
+            success: function(response) {
+                $('#travailTable tbody').html(response);
+            }
+        });
+    }
+
+    // Événement de saisie dans l'input de recherche
+    $('#searchInput').on('input', function() {
+        rechercher();
+    });
+});
+
+
+
+<?php
+// Récupérer la valeur de recherche envoyée en AJAX
+$recherche = $_GET['recherche'];
+
+// Effectuer la recherche dans la base de données en utilisant la valeur de recherche
+$pdo = connection();
+$query = $pdo->prepare("SELECT t.`id` AS travailId, `montant` AS prix, `nom`, `dateDebut`, `dateFin`
+                        FROM travauxraccordement AS t
+                        INNER JOIN devis AS d ON d.id = t.`id_devis`
+                        WHERE t.`nom` LIKE :recherche
+                        OR t.`montant` LIKE :recherche
+                        OR t.`dateDebut` LIKE :recherche
+                        OR t.`dateFin` LIKE :recherche");
+$query->bindValue(':recherche', '%' . $recherche . '%', PDO::PARAM_STR);
+$query->execute();
+
+$output = '';
+if ($query->rowCount() > 0) {
+    while ($row = $query->fetch()) {
+        $output .= "<tr>";
+        $output .= "<td>" . $row['travailId'] . "</td>";
+        $output .= "<td>" . $row['prix'] . "</td>";
+        $output .= "<td>" . $row['nom'] . "</td>";
+        $output .= "<td>" . $row['dateDebut'] . "</td>";
+        $output .= "<td>" . $row['dateFin'] . "</td>";
+        $output .= "<td><button class='btn btn-primary btn-update' id=" . $row['travailId'] . "><i class='ri-edit-box-fill'></i></button></td>";
+        $output .= "<td><button class='btn btn-danger btn-click' id=" . $row['travailId'] . "><i class='ri-delete-bin-6-fill'></i></button></td>";
+        $output .= "</tr>";
+    }
+} else {
+    $output .= "<tr>";
+    $output .= "<td colspan='7'>Aucun résultat trouvé</td>";
+    $output .= "</tr>";
+}
+
+echo $output;
+?>
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Facture</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+
+        .invoice {
+            background-color: #f8f8f8;
+            padding: 20px;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .invoice-body {
+            margin-bottom: 20px;
+        }
+
+        .invoice-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .invoice-total {
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="invoice">
+            <div class="invoice-header">
+                <h2>Facture</h2>
+                <button class="btn btn-primary" onclick="openInvoice()">Télécharger la facture</button>
+            </div>
+            <div class="invoice-body">
+                <!-- Contenu de la facture -->
+            </div>
+            <div class="invoice-total">
+                <h4>Total: <?php echo $montantFixe; ?></h4>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openInvoice() {
+            // Récupérer le contenu de la facture
+            var invoiceContent = document.querySelector('.invoice').innerHTML;
+
+            // Ouvrir un nouvel onglet avec le contenu de la facture
+            var newWindow = window.open('');
+            newWindow.document.write('<html><head><title>Facture</title></head><body>' + invoiceContent + '</body></html>');
+            newWindow.document.close();
+        }
+    </script>
+</body>
+</html>
